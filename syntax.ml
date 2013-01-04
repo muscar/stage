@@ -16,7 +16,7 @@ and binop = BinOpPlus | BinOpMinus
 let rec string_of_exp = function
   | EAgent (name, body) ->
     "agent " ^ name ^ " { " ^ (string_of_seq " " body) ^ " }"
-  | EBel (name, args) -> 
+  | EBel (name, args) ->
     "bel " ^ name ^ "(" ^ (string_of_seq ", " args) ^ ")."
   | EHandler (name, args, body) ->
     name ^ "(" ^ (String.implode ", " args) ^ ") = " ^ (string_of_seq "; " body) ^ "."

@@ -12,6 +12,7 @@
 %token EQUALS
 %token COMMA
 %token SEMICOLON
+%token COLON
 %token PERIOD
 %token PLUS MINUS
 %token SEMICOLON2
@@ -40,7 +41,16 @@ bel_def:
    | BEL VAR LPAREN exp_list RPAREN PERIOD { EBel ($2, $4) }
 
 handler_def:
-   | VAR LPAREN id_list RPAREN EQUALS stmt_list PERIOD { EHandler ($1, $3, $6) }
+   | VAR LPAREN arg_list RPAREN EQUALS stmt_list PERIOD { EHandler ($1, $3, $6) }
+
+arg_list:
+   |                    { [] }
+   | arg                { [$1] }
+   | arg COMMA arg_list { $1 :: $3 }
+
+arg:
+   | VAR           { $1 }
+   | VAR COLON VAR { $1 }
 
 stmt_list:
    |                                  { [] }

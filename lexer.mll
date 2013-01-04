@@ -17,6 +17,7 @@ rule token = parse
 | "="                  { EQUALS }
 | ","                  { COMMA }
 | ";"                  { SEMICOLON }
+| ":"                  { COLON }
 | ";;"                 { SEMICOLON2 }
 | "."                  { PERIOD }
 | "+"                  { PLUS }
