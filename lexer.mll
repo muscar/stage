@@ -9,6 +9,7 @@ rule token = parse
 | ['0'-'9']+           { INT (int_of_string (Lexing.lexeme lexbuf)) }
 | "agent"              { AGENT }
 | "bel"                { BEL }
+| "plan"               { PLAN }
 | "("                  { LPAREN }
 | ")"                  { RPAREN }
 | "{"                  { LCURLY }

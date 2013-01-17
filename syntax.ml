@@ -4,7 +4,7 @@ type name = string
 
 type exp =
     EAgent of name * exp list
-  | EBel of name * exp list
+  | EBel of name * exp
   | EHandler of name * name list * exp list
   | EQuery of name * name list
   | EUpdate of name * exp list
@@ -16,8 +16,8 @@ and binop = BinOpPlus | BinOpMinus
 let rec string_of_exp = function
   | EAgent (name, body) ->
     "agent " ^ name ^ " { " ^ (string_of_seq " " body) ^ " }"
-  | EBel (name, args) ->
-    "bel " ^ name ^ "(" ^ (string_of_seq ", " args) ^ ")."
+  | EBel (name, arg) ->
+    "bel " ^ name ^ " = " ^ (string_of_exp arg) ^ "."
   | EHandler (name, args, body) ->
     name ^ "(" ^ (String.implode ", " args) ^ ") = " ^ (string_of_seq "; " body) ^ "."
   | EQuery (name, args) ->

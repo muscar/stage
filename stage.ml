@@ -23,6 +23,8 @@ let parse =
 let _ = 
   print_endline "stage v0.1a";
   while true do
-    let exps = parse $ read () in
-    List.iter print_endline $ List.map Syntax.string_of_exp exps
+    try
+      let exps = parse $ read () in
+      List.iter print_endline $ List.map Syntax.string_of_exp exps
+    with _ -> print_endline "exn"
   done

@@ -2,8 +2,7 @@
   open Syntax
 %}
 
-%token AGENT
-%token BEL
+%token AGENT BEL PLAN
 %token <Syntax.name> VAR
 %token <int> INT
 %token LPAREN RPAREN
@@ -38,10 +37,10 @@ agent_body:
    | handler_def agent_body           { $1::$2 }
 
 bel_def:
-   | BEL VAR LPAREN exp_list RPAREN PERIOD { EBel ($2, $4) }
+   | BEL VAR EQUALS exp PERIOD        { EBel ($2, $4) }
 
 handler_def:
-   | VAR LPAREN arg_list RPAREN EQUALS stmt_list PERIOD { EHandler ($1, $3, $6) }
+   | PLAN VAR LPAREN arg_list RPAREN EQUALS stmt_list PERIOD { EHandler ($2, $4, $7) }
 
 arg_list:
    |                    { [] }
