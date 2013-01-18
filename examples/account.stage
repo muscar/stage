@@ -1,0 +1,11 @@
+agent Account(initialBalance: int) {
+  bel balance = initialBalance;
+
+  plan withdraw(amount: int) {
+    balance := balance - amount
+  }
+
+  plan deposit(amount: int) {
+    balance := balance + amount
+  }
+}

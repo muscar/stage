@@ -1,0 +1,1 @@
+agent Counter {  bel cnt = 0;  plan inc() {    cnt := cnt + 1  }};;

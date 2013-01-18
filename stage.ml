@@ -20,11 +20,40 @@ let read =
 let parse =
   Parser.toplevel Lexer.token >> Lexing.from_string
 
+let load_file path =
+  let chan = open_in path in
+  let exp = Parser.agent_def Lexer.token (Lexing.from_channel chan) in
+  close_in chan;
+  exp
+
+let dump_file path contents =
+  let chan = open_out path in
+  output_string chan contents;
+  close_out chan
+
+let rec toplevel () =
+  let history = Buffer.create 1024 in
+  let do_exit = ref false in
+  while not !do_exit do
+    try
+      let line = read () in
+      match parse line with
+      | EToplevelCommand ("dump", [Syntax.ELit path]) ->
+	dump_file path (Buffer.contents history)
+      | EToplevelCommand ("load", [Syntax.ELit path]) ->
+	print_endline (Syntax.string_of_exp (load_file path))
+      | EToplevelCommand ("quit", []) -> raise End_of_file
+      | exp -> 
+	Buffer.add_string history line;
+	Compiler.compile exp |> ignore;
+	print_endline (Syntax.string_of_exp exp)
+    with
+    | End_of_file -> 
+      print_endline "Bye!";
+      do_exit := true
+    | _ -> print_endline "exn"
+  done
+
 let _ = 
   print_endline "stage v0.1a";
-  while true do
-    try
-      let exps = parse $ read () in
-      List.iter print_endline $ List.map Syntax.string_of_exp exps
-    with _ -> print_endline "exn"
-  done
+  toplevel ()
