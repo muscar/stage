@@ -4,6 +4,18 @@ let ( **> ) f x = f x
 
 let flip f x y = f y x
 
+module List =
+struct
+  include List
+
+  let zip xs ys =
+    let rec loop acc = function
+      | [], [] -> List.rev acc
+      | x::xs, y::ys -> loop ((x, y)::acc) (xs, ys)
+      | _ -> failwith "List.zip" in
+    loop [] (xs, ys)
+end
+
 module String =
 struct
   include String
@@ -48,12 +60,6 @@ struct
     let s' = List.fold_left (fun s e ->
       let (e, s') = f e s in
       s') s seq in
-    ((), s')
-
-  let iteri f seq = fun s ->
-    let (s', _) = List.fold_left (fun (s, i) e ->
-      let (e, s') = f i e s in
-      (s', i + 1)) (s, 0) seq in
     ((), s')
 
   let run m s = fst (m s)

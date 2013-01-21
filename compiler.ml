@@ -71,7 +71,7 @@ let set_current_method meth =
     cstate <-- get;
     put { cstate with current_method = Some meth }
 
-let in_method meth f =
+let in_new_method meth f =
   let open StateMonad in
   perform
     set_current_method meth;
@@ -96,10 +96,22 @@ let mlookup name =
 let rec compile_agent (EAgent (name, params, body)) =
   let open StateMonad in
   let ty = define_type name in
+  let field_infos = List.map (fun param -> define_field param TyDescInt ty) params in
+  let ctor = define_method "<ctor>" TyDescVoid ty in
   in_new_scope **>
     perform
-      iter (fun param ->
-	register_field **> define_field param TyDescInt ty) params;
+      iter register_field field_infos;
+      (in_new_method ctor **>
+	 perform
+           let param_infos = List.map (fun param ->
+	     define_parameter param TyDescInt ctor) params in
+	   let aux = List.zip field_infos param_infos in
+	   iter (fun (field, param) ->
+	     perform
+	       register_param param;
+	       memit **> OpLdarg param.Emit.sym_index;
+	       memit **> OpStfld field.Emit.sym_index) aux;
+	  memit OpRet);
       iter (compile_member ty) body;
       return ty
 and compile_member ty member = 
@@ -109,11 +121,10 @@ and compile_member ty member =
     register_field **> define_field name TyDescInt ty
   | EHandler (name, params, body) ->
     let meth = define_method name TyDescVoid ty in
-    in_method meth **>
+    in_new_method meth **>
       perform
-        let param_infos = List.map (fun param ->
-	  define_parameter param TyDescInt meth) params in
-	iter register_param param_infos;
+	iter (fun param ->
+	  register_param **> define_parameter param TyDescInt meth) params;
         iter (compile_exp meth) body;
 	memit OpRet
 and compile_exp meth exp = 

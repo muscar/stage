@@ -81,8 +81,8 @@ let define_field name ty_desc ty : field_info =
   field_info
 
 let define_method name ret_ty_desc ty =
-  let method_body = { method_bytecode = DynArray.make 32;
-		      method_locals = DynArray.make 128 } in
+  let method_body = { method_bytecode = DynArray.make 128;
+		      method_locals = DynArray.make 32 } in
   let method_info = { method_declaring_type = ty;
 		      method_ret_type = ret_ty_desc;
 		      method_params = DynArray.create ();
