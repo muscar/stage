@@ -38,15 +38,16 @@ let rec toplevel () =
     try
       let line = read () in
       match parse line with
-      | EToplevelCommand ("dump", [Syntax.ELit path]) ->
+      | TLCommand ("dump", [Syntax.ELit path]) ->
 	dump_file path (Buffer.contents history)
-      | EToplevelCommand ("load", [Syntax.ELit path]) ->
-	print_endline (Syntax.string_of_exp (load_file path))
-      | EToplevelCommand ("quit", []) -> raise End_of_file
-      | exp -> 
+      | TLCommand ("load", [Syntax.ELit path]) ->
+	print_endline (Syntax.string_of_agent_desc (load_file path))
+      | TLCommand ("quit", []) -> raise End_of_file
+      | TLCommand (cmd, _) -> failwith ("unknown command: " ^ cmd)
+      | TLAgent exp -> 
 	Buffer.add_string history line;
 	Compiler.compile exp |> ignore;
-	print_endline (Syntax.string_of_exp exp)
+	print_endline (Syntax.string_of_agent_desc exp)
     with
     | End_of_file -> 
       print_endline "Bye!";

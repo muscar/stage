@@ -11,6 +11,7 @@ rule token = parse
 | "agent"              { AGENT }
 | "bel"                { BEL }
 | "plan"               { PLAN }
+| "let"                { LET }
 | "("                  { LPAREN }
 | ")"                  { RPAREN }
 | "{"                  { LCURLY }

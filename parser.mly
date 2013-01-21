@@ -2,7 +2,7 @@
   open Syntax
 %}
 
-%token AGENT BEL PLAN
+%token AGENT BEL PLAN LET
 %token <Common.name> VAR
 %token <string> LIT
 %token <int> INT
@@ -23,20 +23,20 @@
 %token TL_CMD_QUIT
 
 %start toplevel
-%type <Syntax.exp> toplevel
+%type <Syntax.toplevel> toplevel
 
 %start agent_def
-%type <Syntax.exp> agent_def
+%type <Syntax.agent_desc> agent_def
 
 %left PLUS MINUS
 
 %%
 
 toplevel:
-   | agent_def SEMICOLON2 EOF         { $1 }
-   | TL_CMD_DUMP LIT                  { EToplevelCommand ("dump", [ELit $2]) }
-   | TL_CMD_LOAD LIT                  { EToplevelCommand ("load", [ELit $2]) }
-   | TL_CMD_QUIT                      { EToplevelCommand ("quit", []) }
+   | agent_def SEMICOLON2 EOF         { TLAgent $1 }
+   | TL_CMD_DUMP LIT                  { TLCommand ("dump", [ELit $2]) }
+   | TL_CMD_LOAD LIT                  { TLCommand ("load", [ELit $2]) }
+   | TL_CMD_QUIT                      { TLCommand ("quit", []) }
 
 agent_def:
    | AGENT VAR LCURLY agent_body RCURLY { EAgent ($2, [], $4) }
@@ -69,10 +69,11 @@ stmt_list:
 
 stmt:
    | VAR BECOMES exp                  { EUpdate ($1, $3) }
+   | LET VAR EQUALS exp               { ELocal ($2, $4) }
 
 exp:
    | exp PLUS exp                     { EBinOp (BinOpPlus, $1, $3) }
    | exp MINUS exp                    { EBinOp (BinOpMinus, $1, $3) }
-   | VAR                              { EVar $1 }
+   | VAR                              { ERef $1 }
    | LIT                              { ELit $1 }
    | INT                              { EInt $1 }

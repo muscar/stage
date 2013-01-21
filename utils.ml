@@ -1,5 +1,6 @@
 let ( |> ) x f = f x
 let ( >> ) f g x = f (g x)
+let ( **> ) f x = f x
 
 let flip f x y = f y x
 
@@ -27,4 +28,35 @@ struct
   let endswith s1 s2 =
     let s2_len = length s2 in
     length s1 >= s2_len && (sub s1 (length s1 - s2_len) s2_len) = s2
+end
+
+module StateMonad =
+struct
+  type ('a, 's) t = 's -> ('a * 's)
+
+  let bind m k = fun s ->
+    let (a, s') = m s in
+    k a s'
+
+  let return a = fun s -> (a, s)
+
+  let get = fun s -> (s, s)
+
+  let put a = fun _ -> ((), a)
+
+  let iter f seq = fun s ->
+    let s' = List.fold_left (fun s e ->
+      let (e, s') = f e s in
+      s') s seq in
+    ((), s')
+
+  let iteri f seq = fun s ->
+    let (s', _) = List.fold_left (fun (s, i) e ->
+      let (e, s') = f i e s in
+      (s', i + 1)) (s, 0) seq in
+    ((), s')
+
+  let run m s = fst (m s)
+
+  let ( >>= ) = bind
 end

@@ -1,0 +1,8 @@
+agent Test(blargh: int) {
+  bel x = 0;
+
+  plan foo(m: int) {
+    let y = m + 1;
+    x := x + y
+  }
+}
