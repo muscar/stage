@@ -109,6 +109,8 @@ let rec compile_agent (EAgent (name, params, body)) =
 	   iter (fun (field, param) ->
 	     perform
 	       register_param param;
+	       (* Load `this' *)
+	       memit **> OpLdarg 0;
 	       memit **> OpLdarg param.Emit.sym_index;
 	       memit **> OpStfld field.Emit.sym_index) aux;
 	  memit OpRet);
@@ -140,6 +142,7 @@ and compile_exp meth exp =
     perform
       compile_exp meth value;
       sym <-- mlookup name;
+      memit (OpLdarg 0);
       memit (OpStfld (snd sym))
   | EBinOp (op, left, right) -> 
     perform
@@ -150,7 +153,11 @@ and compile_exp meth exp =
     perform
       sym <-- mlookup name;
       (match fst sym with
-      | SymField -> memit (OpLdfld (snd sym))
+      | SymField -> 
+	perform
+	  (* Load `this' *)
+	  memit (OpLdarg 0);
+	  memit (OpLdfld (snd sym))
       | SymArg -> memit (OpLdarg (snd sym))
       | SymLocal -> memit (OpLdloc (snd sym)))
   | ELit lit -> memit (OpLdStr lit)

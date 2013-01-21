@@ -92,7 +92,8 @@ let define_method name ret_ty_desc ty =
   method_info
 
 let define_parameter name ty_desc meth : param_info =
-  let param_info = { sym_index = DynArray.length meth.method_params;
+  (* Param 0 is the implicit `this' *)
+  let param_info = { sym_index = DynArray.length meth.method_params + 1;
 		     sym_type = ty_desc;
 		     sym_name = name } in
   DynArray.add meth.method_params param_info;

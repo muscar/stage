@@ -2,7 +2,7 @@
   open Parser
 }
 
-let var = ['a'-'z' 'A'-'Z']+
+let ident = ['a'-'z' 'A'-'Z']+
 let lit = '"' [^ '\r' '\n' '"']* '"'
 
 rule token = parse
@@ -31,5 +31,5 @@ rule token = parse
 | "#quit"              { TL_CMD_QUIT }
 
 | lit                  { let lexeme = Lexing.lexeme lexbuf in LIT (String.sub lexeme 1 (String.length lexeme - 2)) }
-| var                  { VAR (Lexing.lexeme lexbuf) }
+| ident                { VAR (Lexing.lexeme lexbuf) }
 | eof                  { EOF }
